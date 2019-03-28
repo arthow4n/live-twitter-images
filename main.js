@@ -90,7 +90,7 @@ const errorLogger = (...args) => {
   ].map(String).join(' ');
 
   console.error(logString);
-  fsx.outputFileSync(path.join(__dirname, 'error.log'), logString + '\n', { flag: 'a' });
+  fsx.outputFile(path.join(__dirname, 'error.log'), logString + '\n', { flag: 'a' });
 };
 
 (async () => {
@@ -114,11 +114,7 @@ const errorLogger = (...args) => {
     followingUsers.push(...data.users);
   }
   logger(`followingUsers.length: ${followingUsers.length}`);
-  fsx.outputJSONSync(path.join(__dirname, 'followingUsers.json'), followingUsers, { spaces: 2 });
-  
-
-  const latestImages = [];
-  const maxLatestImages = 1024;
+  await fsx.outputJSON(path.join(__dirname, 'followingUsers.json'), followingUsers, { spaces: 2 });
 
   const toPhotoFileParams = (tweet, /* media */ {media_url_https, expanded_url, sizes, url}, index) => {
     const createdAtDate = new Date(_.get(tweet, 'retweeted_status.created_at') || _.get(tweet, 'created_at'));
@@ -195,12 +191,12 @@ const errorLogger = (...args) => {
       const [, authorScreenName, shortenedComponent] = fileName.match(/\.([^\.]+)\.t\.co_([^\.]+)\./) || [undefined, undefined, undefined];
       if (!authorScreenName || !shortenedComponent) return;
 
-      fsx.copySync(
+      await fsx.copy(
         path.join(IMAGE_LIKE_FOLDER, fileName),
         path.join(IMAGE_POSTLIKE_FOLDER, fileName),
         { preserveTimestamps: true },
       );
-      fsx.removeSync(path.join(IMAGE_LIKE_FOLDER, fileName));
+      await fsx.remove(path.join(IMAGE_LIKE_FOLDER, fileName));
 
       const shortUrl = `https://t.co/${shortenedComponent}`;
       const twitterUrl = await pResolveRedirection(shortUrl);
