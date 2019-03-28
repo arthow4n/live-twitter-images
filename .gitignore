@@ -1,0 +1,8 @@
+gg
+node_modules
+.env
+focus
+like
+following.json
+followingUsers.json
+*.log
